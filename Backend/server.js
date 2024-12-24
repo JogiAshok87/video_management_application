@@ -1,11 +1,13 @@
 const  express = require('express')
 const mongoose = require('mongoose')
+const cors = require('cors')
 const dotenv = require('dotenv')
 const jwt = require('jsonwebtoken')
 const registerSchema  = require('./Models/Register')
 const video = require('./Models/Videos')
 const app = express()
 app.use(express.json())
+app.use(cors({origin:"*"}))
 
 dotenv.config()
 mongoose.connect(process.env.MONGO_URL)
@@ -18,10 +20,10 @@ mongoose.connect(process.env.MONGO_URL)
 
 
 app.post('/register',async(req,res)=>{
-    const {name,password,confirmPassword,gmail} = req.body 
-    // console.log(name,password,confirmPassword,gmail)
+    const {name,email,password,confirmPassword} = req.body 
+    // console.log(name,password,confirmPassword,email)
     try{
-        const exist = await registerSchema.findOne({gmail})
+        const exist = await registerSchema.findOne({email})
 
     if(exist){
         return res.status(400).json('User Already registered')
@@ -30,7 +32,7 @@ app.post('/register',async(req,res)=>{
     if (password!=confirmPassword){
        return  res.status(400).json('password and confirmPassword should same')
     }
-    let newUser = new registerSchema({name,password,confirmPassword,gmail})
+    let newUser = new registerSchema({name,email,password,confirmPassword})
     await newUser.save()
 
     const payload = {
@@ -83,9 +85,10 @@ app.post("/login",async (req,res)=>{
 })
 
 app.post("/videos",async(req,res)=>{
-    const {title,description,videoURL,tags,size} = req.body;
+    const {title,description,videoUrl,tags,size} = req.body;
+    console.log(req.body)
     try{
-        const newVideo = new video({title,description,videoURL,tags,size})
+        const newVideo = new video({title,description,videoUrl,tags,size})
         await newVideo.save()
         res.status(201).json(newVideo)
     }catch(err){
@@ -94,7 +97,7 @@ app.post("/videos",async(req,res)=>{
     }
 })
 
-app.get("/",async(req,res)=>{
+app.get("/getVideos",async(req,res)=>{
     try{
         const videos = await video.find()
         res.status(200).json(videos);

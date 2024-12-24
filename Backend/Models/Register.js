@@ -7,6 +7,10 @@ const registerSchema = mongoose.Schema({
         required:true,
         min : 10
     },
+    email:{
+        type:String,
+        required: true
+    },
     password:{
         type:String,
         required: true
@@ -14,11 +18,8 @@ const registerSchema = mongoose.Schema({
     confirmPassword:{
         type:String,
         required: true
-    },
-    gmail:{
-        type:String,
-        required: true
     }
+    
 })
 
 module.exports = mongoose.model('Register',registerSchema)
